@@ -1,0 +1,46 @@
+﻿using System.Net.WebSockets;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using IndigoTestTask.Adapters.Sources.Options;
+using IndigoTestTask.Domain.Repositories;
+using IndigoTestTask.Domain.Services.BaseTickConverter;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Polly;
+using Polly.Registry;
+
+namespace IndigoTestTask.Adapters.Sources.Clients;
+
+public abstract class BaseDataSourceAdapter<T>(
+    IDatabusPublisher databusPublisher,
+    ResiliencePipelineProvider<string> pipelineProvider,
+    IDomainTickConverter<T> domainTickConverter, 
+    BaseAdapterOptions options,
+    ILogger logger) : BackgroundService
+    where T : ITickDto
+{
+    private readonly ResiliencePipeline _pipeline = pipelineProvider.GetPipeline("ws-client");
+    
+    protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+    {
+        await _pipeline.ExecuteAsync(InternalExecuteAsync, cancellationToken);
+    }
+    
+    private async ValueTask InternalExecuteAsync(CancellationToken cancellationToken)
+    {
+        using var client = new ClientWebSocket();
+        await client.ConnectAsync(new Uri(options.Url), cancellationToken);
+        await using var stream = WebSocketStream.Create(client, WebSocketMessageType.Binary);
+        var dataEnumerable = JsonSerializer.DeserializeAsyncEnumerable<T>(stream, 
+            topLevelValues: true,
+            options: TickDtoJsonSerializerOptions.JsonSerializerOptions,
+            cancellationToken : cancellationToken);
+        await foreach (var item in dataEnumerable)
+        {
+            if (item is null)
+                throw new ArgumentNullException(nameof(item));
+            var domainModel = domainTickConverter.ToDomainModel(item);
+            await databusPublisher.PublishAsync(JsonSerializer.SerializeToUtf8Bytes(domainModel), cancellationToken);
+        }
+    }
+}

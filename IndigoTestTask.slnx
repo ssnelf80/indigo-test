@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/common/">
+    <File Path="Directory.Packages.props" />
+    <File Path="docker-compose.yml" />
+  </Folder>
+  <Project Path="IndigoTestTask.App/IndigoTestTask.App.csproj" />
+  <Project Path="src/IndigoTestTask.Adapters/IndigoTestTask.Adapters.csproj" />
+  <Project Path="src/IndigoTestTask.DAL/IndigoTestTask.DAL.csproj" />
+  <Project Path="src/IndigoTestTask.Domain/IndigoTestTask.Domain.csproj" />
+  <Project Path="src/IndigoTestTask.Host/IndigoTestTask.Host.csproj" />
+  <Project Path="src/IndigoTestTask.Test/IndigoTestTask.Test.csproj" />
+</Solution>
