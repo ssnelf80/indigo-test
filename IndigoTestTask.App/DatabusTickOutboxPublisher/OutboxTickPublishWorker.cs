@@ -10,18 +10,12 @@ public class OutboxTickPublishWorker(IProducerAccessor producerAccessor, OutboxP
 {
     private const string OutboxTopic = "tick-queue";
     private readonly IMessageProducer _producer = producerAccessor.GetProducer("outbox-producer");
-    private volatile bool _isProcessing = false;
-    private readonly Lock _sync = new();
+    private bool _isProcessing = false;
 
     public void Publish()
     {
-        lock (_sync)
-        {
-            if (_isProcessing)
-                return;
-            
-            _isProcessing = true;
-        }
+        if (Interlocked.CompareExchange(ref _isProcessing, true, false))
+            return;
 
         Task.Run(async () =>
         {
@@ -38,10 +32,7 @@ public class OutboxTickPublishWorker(IProducerAccessor producerAccessor, OutboxP
             }
             finally
             {
-                lock (_sync)
-                {
-                    _isProcessing = false;
-                }
+                Interlocked.Exchange(ref _isProcessing, false);
             }
         });
 
@@ -52,5 +43,4 @@ public class OutboxTickPublishWorker(IProducerAccessor producerAccessor, OutboxP
         foreach (var message in messages)
             await _producer.ProduceAsync(OutboxTopic, message.Id.ToString(), message.Message);
     }
-    
 }

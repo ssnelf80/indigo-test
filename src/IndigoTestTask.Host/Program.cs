@@ -6,16 +6,15 @@ using IndigoTestTask.Adapters.Sources.Options;
 using IndigoTestTask.Adapters.Sources.Servers.Handlers;
 using IndigoTestTask.Adapters.SourceServers;
 using IndigoTestTask.App.DatabusTickOutboxPublisher;
+using IndigoTestTask.DAL;
 using IndigoTestTask.DAL.Outbox;
+using IndigoTestTask.DAL.Ticks;
 using IndigoTestTask.Domain.Repositories;
 using KafkaFlow;
-using KafkaFlow.Serializer;
 using Polly;
 using Polly.Retry;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.ConfigureOutboxFluentMigrator();
 
 // todo {nazarov} через options
 builder.Services.AddKafka(kafka =>
@@ -32,8 +31,11 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<IDatabusPublisher>
 
 
 builder.Services.AddSingleton<OutboxConnectionFactory>();
+builder.Services.AddSingleton<TickConnectionFactory>();
 builder.Services.AddScoped<IOutboxRepository, OutboxRepository>();
 builder.Services.AddSingleton<OutboxProvider>();
+builder.Services.AddScoped<ITickRepository, TickRepository>();
+
 
 // todo {nazarov} вынести в опции
 builder.Services.AddSingleton<AliceAdapterOptions>();
@@ -77,7 +79,7 @@ builder.Services.AddSingleton<ChloeSourceServerHandler>(sp =>
 
 var app = builder.Build();
 
-app.MigrateOutboxDatabase();
+app.MigrateDatabases();
 
 // Configure the HTTP request pipeline.
 

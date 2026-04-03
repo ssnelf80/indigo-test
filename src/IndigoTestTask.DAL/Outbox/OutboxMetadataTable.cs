@@ -10,4 +10,5 @@ public class OutboxMetadataTable(IConventionSet conventionSet, IOptions<RunnerOp
     : DefaultVersionTableMetaData(conventionSet, runnerOptions)
 {
     public override string TableName => "OutboxVersionInfo";
+    public override string UniqueIndexName => "UC_OutboxVersionInfo_Version";
 }
