@@ -7,6 +7,8 @@
     <PackageVersion Include="Dapper.Extensions.PostgreSQL" Version="5.4.2" />
     <PackageVersion Include="FluentMigrator.Runner.Postgres" Version="8.0.1" />
     <PackageVersion Include="KafkaFlow" Version="4.2.0" />
+    <PackageVersion Include="KafkaFlow.BatchConsume" Version="2.5.1" />
+    <PackageVersion Include="KafkaFlow.LogHandler.Microsoft" Version="4.2.0" />
     <PackageVersion Include="KafkaFlow.Microsoft.DependencyInjection" Version="4.2.0" />
     <PackageVersion Include="KafkaFlow.Serializer.JsonCore" Version="4.2.0" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.5" />

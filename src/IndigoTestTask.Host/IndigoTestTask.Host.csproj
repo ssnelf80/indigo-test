@@ -14,6 +14,8 @@
 
     <ItemGroup>
       <PackageReference Include="KafkaFlow" />
+      <PackageReference Include="KafkaFlow.BatchConsume" />
+      <PackageReference Include="KafkaFlow.LogHandler.Microsoft" />
       <PackageReference Include="KafkaFlow.Microsoft.DependencyInjection" />
       <PackageReference Include="KafkaFlow.Serializer.JsonCore" />
       <PackageReference Include="Polly" />

@@ -1,29 +1,22 @@
-using System.Text.Json;
-using IndigoTestTask.Adapters.Sources;
 using IndigoTestTask.Adapters.Sources.Clients.Adapters;
 using IndigoTestTask.Adapters.Sources.Converters;
 using IndigoTestTask.Adapters.Sources.Options;
 using IndigoTestTask.Adapters.Sources.Servers.Handlers;
 using IndigoTestTask.Adapters.SourceServers;
+using IndigoTestTask.App.DatabusTickConsumer;
 using IndigoTestTask.App.DatabusTickOutboxPublisher;
 using IndigoTestTask.DAL;
 using IndigoTestTask.DAL.Outbox;
 using IndigoTestTask.DAL.Ticks;
+using IndigoTestTask.Domain.Entities;
 using IndigoTestTask.Domain.Repositories;
 using KafkaFlow;
+using KafkaFlow.Serializer;
 using Polly;
 using Polly.Retry;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// todo {nazarov} через options
-builder.Services.AddKafka(kafka =>
-    kafka.AddCluster(cluster =>
-        cluster.WithBrokers(["localhost:9092"])
-            .AddProducer("outbox-producer", producer => producer.DefaultTopic(
-                    "tick-queue")
-                )
-    ));
 
 // Add services to the container.
 builder.Services.AddSingleton<IDatabusPublisher, DatabusTickPublisher>();
@@ -35,7 +28,6 @@ builder.Services.AddSingleton<TickConnectionFactory>();
 builder.Services.AddScoped<IOutboxRepository, OutboxRepository>();
 builder.Services.AddSingleton<OutboxProvider>();
 builder.Services.AddScoped<ITickRepository, TickRepository>();
-
 
 // todo {nazarov} вынести в опции
 builder.Services.AddSingleton<AliceAdapterOptions>();
@@ -49,6 +41,28 @@ builder.Services.AddSingleton<ChloeDomainTickConverter>();
 builder.Services.AddHostedService<AliceDataSourceAdapter>();
 builder.Services.AddHostedService<BobDataSourceAdapter>();
 builder.Services.AddHostedService<ChloeDataSourceAdapter>();
+
+builder.Services.AddKafka(kafka =>
+    kafka
+        .UseMicrosoftLog()
+        .AddCluster(cluster =>
+        cluster.WithBrokers(["localhost:9092"])
+            .AddProducer("outbox-producer", producer => producer.DefaultTopic(
+                "tick-queue")
+            )
+            .AddConsumer(consumer => consumer
+                .Topic("tick-queue")
+                .WithGroupId("tick-consumers")
+                .WithBufferSize(100)
+                .WithWorkersCount(1)
+                .WithAutoOffsetReset(AutoOffsetReset.Earliest)
+                .AddMiddlewares(middlewares =>
+                    middlewares
+                        .AddSingleTypeDeserializer<Tick, JsonCoreDeserializer>()
+                        .AddBatching(100, TimeSpan.FromSeconds(1))
+                        .Add<DatabusTickBatchConsumerHandler>()
+                )
+            )));
 
 // todo {nazarov} по-идее можно создать ручками класс наследник и не резолвить через строки
 builder.Services.AddResiliencePipeline("ws-client", builder =>
@@ -80,6 +94,9 @@ builder.Services.AddSingleton<ChloeSourceServerHandler>(sp =>
 var app = builder.Build();
 
 app.MigrateDatabases();
+
+var bus = app.Services.CreateKafkaBus();
+await bus.StartAsync();
 
 // Configure the HTTP request pipeline.
 

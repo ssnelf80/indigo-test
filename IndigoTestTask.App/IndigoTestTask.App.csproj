@@ -22,11 +22,8 @@
 
     <ItemGroup>
       <PackageReference Include="KafkaFlow" />
+      <PackageReference Include="KafkaFlow.BatchConsume" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="DatabusTickConsumer\" />
     </ItemGroup>
 
 </Project>

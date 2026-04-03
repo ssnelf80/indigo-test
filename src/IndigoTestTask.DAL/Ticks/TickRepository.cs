@@ -18,7 +18,7 @@ public class TickRepository(TickConnectionFactory connectionFactory) : ITickRepo
                                             unnest(@Prices) as price,
                                             unnest(@Volumes) as volume,
                                             unnest(@Stocks)::stock_type as stock
-                                    )
+                                    ) v
                                     WHERE NOT EXISTS (
                                         SELECT 1 FROM ticks t 
                                         WHERE t.hash = hash_record_extended(ROW(v.ticker, v.timestamp, v.price, v.volume, v.stock), 0)
@@ -39,7 +39,7 @@ public class TickRepository(TickConnectionFactory connectionFactory) : ITickRepo
             Timestamps = ticks.Select(t => t.Timestamp).ToArray(),
             Prices = ticks.Select(t => t.Price).ToArray(),
             Volumes = ticks.Select(t => t.Volume).ToArray(),
-            Stocks = ticks.Select(t => t.Stock.ToString()).ToArray() 
+            Stocks = ticks.Select(t => t.Stock.ToString().ToLower()).ToArray() 
         };
         await connection.ExecuteAsync(new CommandDefinition(query, parameters, cancellationToken: cancellationToken));
         connection.Close();
