@@ -60,8 +60,7 @@ public class OutboxProvider(OutboxConnectionFactory connectionFactory)
             transaction.Rollback();
             throw;
         }
-        
-        connection.Close();
+       
         return true;
     }
 }

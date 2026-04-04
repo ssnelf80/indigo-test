@@ -16,8 +16,8 @@ public static class MigrationExtensions
     {
         var outboxConnectionString = host.Services.GetService<IConfiguration>()!.GetConnectionString("OutboxConnection");
         var tickConnectionString = host.Services.GetService<IConfiguration>()!.GetConnectionString("TickConnection");
-        MigrateOutbox(outboxConnectionString);
-        MigrateTick(tickConnectionString);
+        MigrateOutbox(outboxConnectionString!);
+        MigrateTick(tickConnectionString!);
     }
 
     private static void MigrateOutbox(string connectionString)

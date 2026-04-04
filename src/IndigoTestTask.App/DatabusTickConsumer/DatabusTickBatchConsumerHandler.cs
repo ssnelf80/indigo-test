@@ -10,7 +10,7 @@ public class DatabusTickBatchConsumerHandler(IServiceScopeFactory scopeFactory) 
     public async Task Invoke(IMessageContext context, MiddlewareDelegate next)
     {
         var ticks = context.GetMessagesBatch()
-            .Select(x => (Tick)x.Message.Value).ToArray();
+            .Select(x => (Tick)x.Message.Value).ToHashSet();
 
         using var scope = scopeFactory.CreateScope();
         var repository = scope.ServiceProvider.GetRequiredService<ITickRepository>();

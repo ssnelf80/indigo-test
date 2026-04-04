@@ -8,7 +8,6 @@ public class TickRepository(TickConnectionFactory connectionFactory) : ITickRepo
 {
     public async Task AddTicksAsync(IReadOnlyCollection<Tick> ticks, CancellationToken cancellationToken)
     {
-        // todo {nazarov} добвить красоты
         const string query = """
                              INSERT INTO ticks (ticker, timestamp, price, volume, stock)
                                     SELECT v.ticker, v.timestamp, v.price, v.volume, v.stock

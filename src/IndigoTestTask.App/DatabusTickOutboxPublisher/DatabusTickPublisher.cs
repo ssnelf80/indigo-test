@@ -4,6 +4,7 @@ using KafkaFlow.Producers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
+
 namespace IndigoTestTask.App.DatabusTickOutboxPublisher;
 
 public class DatabusTickPublisher : IDatabusPublisher, IDisposable
