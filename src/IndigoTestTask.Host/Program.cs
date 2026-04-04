@@ -1,8 +1,9 @@
 using IndigoTestTask.Adapters.Sources.Clients.Adapters;
 using IndigoTestTask.Adapters.Sources.Converters;
 using IndigoTestTask.Adapters.Sources.Options;
+using IndigoTestTask.Adapters.Sources.Servers;
 using IndigoTestTask.Adapters.Sources.Servers.Handlers;
-using IndigoTestTask.Adapters.SourceServers;
+using IndigoTestTask.App;
 using IndigoTestTask.App.DatabusTickConsumer;
 using IndigoTestTask.App.DatabusTickOutboxPublisher;
 using IndigoTestTask.DAL;
@@ -16,6 +17,12 @@ using Polly;
 using Polly.Retry;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseDefaultServiceProvider((_, options) =>
+{
+    options.ValidateScopes = true;
+    options.ValidateOnBuild = true;
+});
 
 
 // Add services to the container.
@@ -42,6 +49,8 @@ builder.Services.AddHostedService<AliceDataSourceAdapter>();
 builder.Services.AddHostedService<BobDataSourceAdapter>();
 builder.Services.AddHostedService<ChloeDataSourceAdapter>();
 
+builder.Services.AddHostedService<TickProcessedChecker>();
+
 builder.Services.AddKafka(kafka =>
     kafka
         .UseMicrosoftLog()
@@ -54,8 +63,9 @@ builder.Services.AddKafka(kafka =>
                 .Topic("tick-queue")
                 .WithGroupId("tick-consumers")
                 .WithBufferSize(100)
-                .WithWorkersCount(1)
+                .WithWorkersCount(4)
                 .WithAutoOffsetReset(AutoOffsetReset.Earliest)
+                .WithAutoCommitIntervalMs(3_000) 
                 .AddMiddlewares(middlewares =>
                     middlewares
                         .AddSingleTypeDeserializer<Tick, JsonCoreDeserializer>()
@@ -65,7 +75,7 @@ builder.Services.AddKafka(kafka =>
             )));
 
 // todo {nazarov} по-идее можно создать ручками класс наследник и не резолвить через строки
-builder.Services.AddResiliencePipeline("ws-client", builder =>
+builder.Services.AddResiliencePipeline("ws-client", (builder) =>
 {
     builder.AddRetry(new RetryStrategyOptions
     {
@@ -75,7 +85,7 @@ builder.Services.AddResiliencePipeline("ws-client", builder =>
         UseJitter = true,
         Delay = TimeSpan.FromSeconds(1),
         MaxDelay = TimeSpan.FromSeconds(10),
-        ShouldHandle = new PredicateBuilder().Handle<Exception>(),
+        ShouldHandle = new PredicateBuilder().Handle<Exception>()
     });
 });
 
@@ -91,12 +101,15 @@ builder.Services.AddSingleton<ChloeSourceServerHandler>(sp =>
     new ChloeSourceServerHandler(SourceServerOptions.Instance));
 
 
+
 var app = builder.Build();
+var bus = app.Services.CreateKafkaBus();
+await bus.StartAsync();
+
 
 app.MigrateDatabases();
 
-var bus = app.Services.CreateKafkaBus();
-await bus.StartAsync();
+
 
 // Configure the HTTP request pipeline.
 
@@ -111,4 +124,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+
+
 app.Run();
+

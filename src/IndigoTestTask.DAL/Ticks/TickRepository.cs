@@ -8,6 +8,7 @@ public class TickRepository(TickConnectionFactory connectionFactory) : ITickRepo
 {
     public async Task AddTicksAsync(IReadOnlyCollection<Tick> ticks, CancellationToken cancellationToken)
     {
+        // todo {nazarov} добвить красоты
         const string query = """
                              INSERT INTO ticks (ticker, timestamp, price, volume, stock)
                                     SELECT v.ticker, v.timestamp, v.price, v.volume, v.stock
@@ -42,6 +43,13 @@ public class TickRepository(TickConnectionFactory connectionFactory) : ITickRepo
             Stocks = ticks.Select(t => t.Stock.ToString().ToLower()).ToArray() 
         };
         await connection.ExecuteAsync(new CommandDefinition(query, parameters, cancellationToken: cancellationToken));
-        connection.Close();
+    }
+
+    public async Task<long> CountAsync(CancellationToken cancellationToken)
+    {
+        const string query = "SELECT COUNT(hash) FROM ticks";
+        using var connection = connectionFactory.Create();
+        connection.Open();
+        return await connection.ExecuteScalarAsync<long>(query, cancellationToken);
     }
 }

@@ -11,13 +11,13 @@ public class DatabusTickPublisher : IDatabusPublisher, IDisposable
     private const int CheckOutboxDatabaseTimeoutMs = 300;
     private const int CountOfWorkers = 8;
     private readonly Timer _timerPoll;
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IServiceScopeFactory _serviceProviderFactory;
     private readonly IReadOnlyCollection<OutboxTickPublishWorker> _outboxPublishWorkers;
     
 
-    public DatabusTickPublisher(IProducerAccessor producerAccessor, IServiceProvider serviceProvider, ILogger<DatabusTickPublisher> logger, OutboxProvider outboxProvider)
+    public DatabusTickPublisher(IProducerAccessor producerAccessor, IServiceScopeFactory serviceProviderFactory, ILogger<DatabusTickPublisher> logger, OutboxProvider outboxProvider)
     {
-        _serviceProvider = serviceProvider;
+        _serviceProviderFactory = serviceProviderFactory;
         _timerPoll = new Timer(PollCallback, null, Timeout.Infinite, Timeout.Infinite);
         
         List<OutboxTickPublishWorker> workers = new();
@@ -29,7 +29,7 @@ public class DatabusTickPublisher : IDatabusPublisher, IDisposable
 
     public async Task PublishAsync(byte[] message, CancellationToken cancellationToken)
     {
-        using var scope = _serviceProvider.CreateScope();
+        using var scope = _serviceProviderFactory.CreateScope();
         var outboxRepository = scope.ServiceProvider.GetRequiredService<IOutboxRepository>();
         await outboxRepository.SaveAsync(message, cancellationToken);
     }

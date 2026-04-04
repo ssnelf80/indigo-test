@@ -15,5 +15,5 @@ public sealed class BobDataSourceAdapter(
     ILogger<BobDataSourceAdapter> logger) 
     : BaseDataSourceAdapter<BobSourceDto>(databusPublisher, pipelineProvider, domainTickConverter, options, logger)
 {
-    
+    protected override string AdapterName => "Bob";
 }

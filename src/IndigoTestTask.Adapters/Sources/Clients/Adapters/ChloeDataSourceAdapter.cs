@@ -15,5 +15,5 @@ public sealed class ChloeDataSourceAdapter(
     ILogger<ChloeDataSourceAdapter> logger) 
     : BaseDataSourceAdapter<ChloeSourceDto>(databusPublisher, pipelineProvider, domainTickConverter, options, logger)
 {
-    
+    protected override string AdapterName => "Chloe";
 }

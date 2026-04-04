@@ -15,5 +15,5 @@ public sealed class AliceDataSourceAdapter(
     ILogger<AliceDataSourceAdapter> logger) 
     : BaseDataSourceAdapter<AliceSourceDto>(databusPublisher, pipelineProvider, domainTickConverter, options, logger)
 {
-    
+    protected override string AdapterName => "Alice";
 }

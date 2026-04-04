@@ -20,6 +20,7 @@ public abstract class BaseDataSourceAdapter<T>(
     where T : ITickDto
 {
     private readonly ResiliencePipeline _pipeline = pipelineProvider.GetPipeline("ws-client");
+    protected abstract string AdapterName { get; }
     
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
@@ -28,19 +29,30 @@ public abstract class BaseDataSourceAdapter<T>(
     
     private async ValueTask InternalExecuteAsync(CancellationToken cancellationToken)
     {
-        using var client = new ClientWebSocket();
-        await client.ConnectAsync(new Uri(options.Url), cancellationToken);
-        await using var stream = WebSocketStream.Create(client, WebSocketMessageType.Binary);
-        var dataEnumerable = JsonSerializer.DeserializeAsyncEnumerable<T>(stream, 
-            topLevelValues: true,
-            options: TickDtoJsonSerializerOptions.JsonSerializerOptions,
-            cancellationToken : cancellationToken);
-        await foreach (var item in dataEnumerable)
+        try
         {
-            if (item is null)
-                throw new ArgumentNullException(nameof(item));
-            var domainModel = domainTickConverter.ToDomainModel(item);
-            await databusPublisher.PublishAsync(JsonSerializer.SerializeToUtf8Bytes(domainModel), cancellationToken);
+            using var client = new ClientWebSocket();
+            await client.ConnectAsync(new Uri(options.Url), cancellationToken);
+            logger.LogInformation("Adapter {Name} connected", AdapterName);
+            await using var stream = WebSocketStream.Create(client, WebSocketMessageType.Binary);
+            var dataEnumerable = JsonSerializer.DeserializeAsyncEnumerable<T>(stream,
+                topLevelValues: true,
+                options: TickDtoJsonSerializerOptions.JsonSerializerOptions,
+                cancellationToken: cancellationToken);
+            await foreach (var item in dataEnumerable)
+            {
+                if (item is null)
+                    throw new ArgumentNullException(nameof(item));
+                var domainModel = domainTickConverter.ToDomainModel(item);
+                await databusPublisher.PublishAsync(JsonSerializer.SerializeToUtf8Bytes(domainModel),
+                    cancellationToken);
+            }
         }
+        catch (Exception ex)
+        {
+            logger.LogError("Adapter {Name} error: {Message}", AdapterName, ex.Message);
+            throw;
+        }
+       
     }
 }

@@ -2,7 +2,6 @@
 using System.Net.WebSockets;
 using System.Text.Json;
 using IndigoTestTask.Adapters.Sources.Options;
-using IndigoTestTask.Adapters.SourceServers;
 using IndigoTestTask.Domain.Services.BaseTickConverter;
 
 namespace IndigoTestTask.Adapters.Sources.Servers;
@@ -36,7 +35,7 @@ public abstract class BaseSourceServerHandler<T>(SourceServerOptions options) wh
                 var message = GetSerializedMessage();
                 await stream.WriteAsync(message, cancellationToken);
 
-                if (options.CanSendDuplicate && IsRandomEvent(0.05))
+                if (options.CanSendDuplicate && !IsRandomEvent(0.05))
                     await stream.WriteAsync(message, cancellationToken);
             }
             
@@ -57,12 +56,12 @@ public abstract class BaseSourceServerHandler<T>(SourceServerOptions options) wh
     }
     protected abstract T GenerateMessage();
 
-    private bool IsShouldAbort() => IsLongTimeAbort() && IsSingleTimeAbort();
+    private bool IsShouldAbort() => IsLongTimeAbort() || IsSingleTimeAbort();
     private bool IsRandomEvent(double percentage) => Random.NextDouble() <= percentage;
 
     private bool IsLongTimeAbort()
     {
-        if (!options.CanLongTimeAbort || IsRandomEvent(0.005))
+        if (!options.CanLongTimeAbort || !IsRandomEvent(0.001))
             return false;
         
         _isUnavailable = true;
@@ -76,7 +75,7 @@ public abstract class BaseSourceServerHandler<T>(SourceServerOptions options) wh
 
     private bool IsSingleTimeAbort()
     {
-        if (!options.CanSingleTimeAbort || IsRandomEvent(0.01))
+        if (!options.CanSingleTimeAbort || !IsRandomEvent(0.005))
             return false;
 
         return true;

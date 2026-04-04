@@ -1,12 +1,12 @@
-﻿namespace IndigoTestTask.Adapters.SourceServers;
+﻿namespace IndigoTestTask.Adapters.Sources.Servers;
 
 public class SourceServerOptions
 {
     public static SourceServerOptions Instance => new SourceServerOptions
     {
-        CanSendDuplicate = false,
-        CanLongTimeAbort = false,
-        CanSingleTimeAbort = false,
+        CanSendDuplicate = true,
+        CanLongTimeAbort = true,
+        CanSingleTimeAbort = true,
         Rps = 100
     };
 
