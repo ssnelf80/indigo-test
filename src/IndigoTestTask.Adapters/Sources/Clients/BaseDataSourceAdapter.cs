@@ -6,6 +6,7 @@ using IndigoTestTask.Domain.Repositories;
 using IndigoTestTask.Domain.Services.BaseTickConverter;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Registry;
 
@@ -15,11 +16,12 @@ public abstract class BaseDataSourceAdapter<T>(
     IDatabusPublisher databusPublisher,
     ResiliencePipelineProvider<string> pipelineProvider,
     IDomainTickConverter<T> domainTickConverter, 
-    BaseAdapterOptions options,
+    IOptions<BaseAdapterOptions> adapterOptions,
     ILogger logger) : BackgroundService
     where T : ITickDto
 {
     private readonly ResiliencePipeline _pipeline = pipelineProvider.GetPipeline("ws-client");
+    private readonly BaseAdapterOptions _options = adapterOptions.Value;
     protected abstract string AdapterName { get; }
     
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
@@ -32,7 +34,7 @@ public abstract class BaseDataSourceAdapter<T>(
         try
         {
             using var client = new ClientWebSocket();
-            await client.ConnectAsync(new Uri(options.Url), cancellationToken);
+            await client.ConnectAsync(new Uri(_options.Url), cancellationToken);
             logger.LogInformation("Adapter {Name} connected", AdapterName);
             await using var stream = WebSocketStream.Create(client, WebSocketMessageType.Binary);
             var dataEnumerable = JsonSerializer.DeserializeAsyncEnumerable<T>(stream,
@@ -53,6 +55,5 @@ public abstract class BaseDataSourceAdapter<T>(
             logger.LogError("Adapter {Name} error: {Message}", AdapterName, ex.Message);
             throw;
         }
-       
     }
 }

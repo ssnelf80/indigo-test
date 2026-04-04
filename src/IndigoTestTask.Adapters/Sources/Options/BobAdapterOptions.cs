@@ -4,5 +4,5 @@ namespace IndigoTestTask.Adapters.Sources.Options;
 
 public class BobAdapterOptions : BaseAdapterOptions
 {
-    public override required string Url { get; init; } = "ws://localhost:5054/ws-bob";
+    public override required string Url { get; init; }
 }

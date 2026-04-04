@@ -1,8 +1,10 @@
 using IndigoTestTask.Adapters.Sources.Dtos;
+using IndigoTestTask.Adapters.Sources.Options;
+using Microsoft.Extensions.Options;
 
 namespace IndigoTestTask.Adapters.Sources.Servers.Handlers;
 
-public sealed class ChloeSourceServerHandler(SourceServerOptions options)
+public sealed class ChloeSourceServerHandler(IOptions<ChloeServiceOptions> options)
     : BaseSourceServerHandler<ChloeSourceDto>(options)
 {
     protected override ChloeSourceDto GenerateMessage()

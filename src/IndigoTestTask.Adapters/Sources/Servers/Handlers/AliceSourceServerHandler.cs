@@ -1,9 +1,11 @@
 using System.Globalization;
 using IndigoTestTask.Adapters.Sources.Dtos;
+using IndigoTestTask.Adapters.Sources.Options;
+using Microsoft.Extensions.Options;
 
 namespace IndigoTestTask.Adapters.Sources.Servers.Handlers;
 
-public sealed class AliceSourceServerHandler(SourceServerOptions options)
+public sealed class AliceSourceServerHandler(IOptions<AliceServiceOptions> options)
     : BaseSourceServerHandler<AliceSourceDto>(options)
 {
     protected override AliceSourceDto GenerateMessage()

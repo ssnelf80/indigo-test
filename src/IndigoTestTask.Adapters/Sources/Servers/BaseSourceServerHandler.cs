@@ -3,14 +3,16 @@ using System.Net.WebSockets;
 using System.Text.Json;
 using IndigoTestTask.Adapters.Sources.Options;
 using IndigoTestTask.Domain.Services.BaseTickConverter;
+using Microsoft.Extensions.Options;
 
 namespace IndigoTestTask.Adapters.Sources.Servers;
 
-public abstract class BaseSourceServerHandler<T>(SourceServerOptions options) where T : ITickDto
+public abstract class BaseSourceServerHandler<T>(IOptions<BaseSourceServerOptions> serverOptions) where T : ITickDto
 {
     private volatile bool _isUnavailable = false;
     private readonly Stopwatch _stopwatch = new();
     protected readonly Random Random = new();
+    private readonly BaseSourceServerOptions _options = serverOptions.Value;
     
     public async Task Handle(WebSocket webSocket, CancellationToken cancellationToken)
     {
@@ -25,7 +27,7 @@ public abstract class BaseSourceServerHandler<T>(SourceServerOptions options) wh
         while (true)
         {
             _stopwatch.Restart();
-            for (var i = 0; i < options.Rps; ++i)
+            for (var i = 0; i < _options.Rps; ++i)
             {
                 if (IsShouldAbort())
                 {
@@ -35,7 +37,7 @@ public abstract class BaseSourceServerHandler<T>(SourceServerOptions options) wh
                 var message = GetSerializedMessage();
                 await stream.WriteAsync(message, cancellationToken);
 
-                if (options.CanSendDuplicate && !IsRandomEvent(0.05))
+                if (_options.CanSendDuplicate && !IsRandomEvent(0.05))
                     await stream.WriteAsync(message, cancellationToken);
             }
             
@@ -61,7 +63,7 @@ public abstract class BaseSourceServerHandler<T>(SourceServerOptions options) wh
 
     private bool IsLongTimeAbort()
     {
-        if (!options.CanLongTimeAbort || !IsRandomEvent(0.001))
+        if (!_options.CanLongTimeAbort || !IsRandomEvent(0.001))
             return false;
         
         _isUnavailable = true;
@@ -75,11 +77,10 @@ public abstract class BaseSourceServerHandler<T>(SourceServerOptions options) wh
 
     private bool IsSingleTimeAbort()
     {
-        if (!options.CanSingleTimeAbort || !IsRandomEvent(0.005))
+        if (!_options.CanSingleTimeAbort || !IsRandomEvent(0.005))
             return false;
 
         return true;
     }
-    
     
 }
