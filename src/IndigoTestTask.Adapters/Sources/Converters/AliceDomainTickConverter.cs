@@ -6,9 +6,9 @@ using IndigoTestTask.Domain.Services.BaseTickConverter;
 
 namespace IndigoTestTask.Adapters.Sources.Converters;
 
-public class AliceDomainTickConverter : IDomainTickConverter<AliceSourceDto>
+public class AliceDomainTickConverter : BaseDomainTickConverter<AliceSourceDto>
 {
-    public Tick ToDomainModel(AliceSourceDto dto) =>
+    protected override Tick Convert(AliceSourceDto dto) =>
         new()
         {
             Ticker = dto.Id,

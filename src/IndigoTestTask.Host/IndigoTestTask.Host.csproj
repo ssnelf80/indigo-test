@@ -7,8 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\IndigoTestTask.App\IndigoTestTask.App.csproj" />
+      <ProjectReference Include="..\IndigoTestTask.App\IndigoTestTask.App.csproj" />
       <ProjectReference Include="..\IndigoTestTask.Adapters\IndigoTestTask.Adapters.csproj" />
+      <ProjectReference Include="..\IndigoTestTask.App\IndigoTestTask.App.csproj" />
       <ProjectReference Include="..\IndigoTestTask.DAL\IndigoTestTask.DAL.csproj" />
     </ItemGroup>
 

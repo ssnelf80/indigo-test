@@ -20,6 +20,5 @@ public class OutboxRepository(OutboxConnectionFactory connectionFactory) : IOutb
             cancellationToken: cancellationToken);
         
         await connection.ExecuteAsync(command);
-        connection.Close();
     }
 }

@@ -15,7 +15,7 @@ namespace IndigoTestTask.Adapters.Sources.Clients;
 public abstract class BaseDataSourceAdapter<T>(
     IDatabusPublisher databusPublisher,
     ResiliencePipelineProvider<string> pipelineProvider,
-    IDomainTickConverter<T> domainTickConverter, 
+    BaseDomainTickConverter<T> domainTickConverter, 
     IOptions<BaseAdapterOptions> adapterOptions,
     ILogger logger) : BackgroundService
     where T : ITickDto
