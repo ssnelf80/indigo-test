@@ -12,10 +12,10 @@ namespace IndigoTestTask.DAL;
 
 public static class MigrationExtensions
 {
-    public static void MigrateDatabases(this IHost host)
+    public static void MigrateDatabases(this IServiceProvider serviceProvider)
     {
-        var outboxConnectionString = host.Services.GetService<IConfiguration>()!.GetConnectionString("OutboxConnection");
-        var tickConnectionString = host.Services.GetService<IConfiguration>()!.GetConnectionString("TickConnection");
+        var outboxConnectionString = serviceProvider.GetService<IConfiguration>()!.GetConnectionString("OutboxConnection");
+        var tickConnectionString = serviceProvider.GetService<IConfiguration>()!.GetConnectionString("TickConnection");
         MigrateOutbox(outboxConnectionString!);
         MigrateTick(tickConnectionString!);
     }

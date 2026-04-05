@@ -22,7 +22,7 @@ var app = builder.Build();
 var bus = app.Services.CreateKafkaBus();
 await bus.StartAsync();
 
-app.MigrateDatabases();
+app.Services.MigrateDatabases();
 
 app.UseWebSockets(new WebSocketOptions
 {

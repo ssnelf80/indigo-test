@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/common/">
     <File Path="Directory.Packages.props" />
+    <File Path="docker-compose.test.yml" />
     <File Path="docker-compose.yml" />
   </Folder>
   <Project Path="src/IndigoTestTask.Adapters/IndigoTestTask.Adapters.csproj" />
