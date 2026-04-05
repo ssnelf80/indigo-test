@@ -23,6 +23,7 @@ public class Init : Migration
                     );
 
                     CREATE INDEX hash_index ON ticks (hash);
+                    CREATE UNIQUE INDEX ticker_hash_index ON ticks (ticker, hash);
                     """);
     }
 

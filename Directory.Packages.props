@@ -13,6 +13,7 @@
     <PackageVersion Include="KafkaFlow.BatchConsume" Version="2.5.1" />
     <PackageVersion Include="KafkaFlow.LogHandler.Microsoft" Version="4.2.0" />
     <PackageVersion Include="KafkaFlow.Microsoft.DependencyInjection" Version="4.2.0" />
+    <PackageVersion Include="KafkaFlow.Retry" Version="3.1.0" />
     <PackageVersion Include="KafkaFlow.Serializer.JsonCore" Version="4.2.0" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.5" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.5" />

@@ -12,6 +12,10 @@
         <PackageReference Include="Ductus.FluentDocker" />
         <PackageReference Include="Ductus.FluentDocker.XUnit" />
         <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="KafkaFlow" />
+        <PackageReference Include="KafkaFlow.Microsoft.DependencyInjection" />
+        <PackageReference Include="KafkaFlow.Retry" />
+        <PackageReference Include="KafkaFlow.Serializer.JsonCore" />
         <PackageReference Include="Microsoft.Extensions.Configuration" />
         <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" />
         <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" />

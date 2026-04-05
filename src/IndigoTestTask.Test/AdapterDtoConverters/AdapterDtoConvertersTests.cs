@@ -81,7 +81,7 @@ public class AdapterDtoConvertersTests
         // Arrange
         var dto = new BobSourceDto
         {
-            Ticker = null,
+            Ticker = null!,
             TotalPrice = 10,
             Count = 5
         };

@@ -2,7 +2,6 @@
 using IndigoTestTask.Domain.Repositories;
 using KafkaFlow.Producers;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 

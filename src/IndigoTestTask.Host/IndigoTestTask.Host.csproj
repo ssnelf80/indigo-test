@@ -18,6 +18,7 @@
       <PackageReference Include="KafkaFlow.BatchConsume" />
       <PackageReference Include="KafkaFlow.LogHandler.Microsoft" />
       <PackageReference Include="KafkaFlow.Microsoft.DependencyInjection" />
+      <PackageReference Include="KafkaFlow.Retry" />
       <PackageReference Include="KafkaFlow.Serializer.JsonCore" />
       <PackageReference Include="Microsoft.Extensions.Resilience" />
       <PackageReference Include="Polly" />

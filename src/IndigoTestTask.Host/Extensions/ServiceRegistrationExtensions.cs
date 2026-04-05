@@ -10,6 +10,7 @@ using IndigoTestTask.DAL.Ticks;
 using IndigoTestTask.Domain.Entities;
 using IndigoTestTask.Domain.Repositories;
 using KafkaFlow;
+using KafkaFlow.Retry;
 using KafkaFlow.Serializer;
 using Polly;
 using Polly.Retry;
@@ -46,6 +47,7 @@ public static class ServiceRegistrationExtensions
                 .UseMicrosoftLog()
                 .AddCluster(cluster =>
                     cluster.WithBrokers(["localhost:9092"])
+                        .CreateTopicIfNotExists("tick-queue", 1)
                         .AddProducer("outbox-producer", producer => producer.DefaultTopic(
                             "tick-queue")
                         )
@@ -59,6 +61,7 @@ public static class ServiceRegistrationExtensions
                             .AddMiddlewares(middlewares =>
                                 middlewares
                                     .AddSingleTypeDeserializer<Tick, JsonCoreDeserializer>()
+                                    .RetryForever(retry => retry.WithTimeBetweenTriesPlan(TimeSpan.FromSeconds(1)))
                                     .AddBatching(100, TimeSpan.FromSeconds(1))
                                     .Add<DatabusTickBatchConsumerHandler>()
                             )
@@ -101,7 +104,7 @@ public static class ServiceRegistrationExtensions
     public static void AddCore(this IHostApplicationBuilder builder)
     {
         builder.Services.AddSingleton<TickConnectionFactory>();
-        builder.Services.AddScoped<ITickRepository, TickRepository>();
+        builder.Services.AddScoped<ITickRepository, TickConnectionRepository>();
 
         builder.Services.AddHostedService<TickProcessedChecker>();
     }

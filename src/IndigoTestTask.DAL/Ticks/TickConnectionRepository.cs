@@ -4,7 +4,7 @@ using IndigoTestTask.Domain.Repositories;
 
 namespace IndigoTestTask.DAL.Ticks;
 
-public class TickRepository(TickConnectionFactory connectionFactory) : ITickRepository
+public class TickConnectionRepository(TickConnectionFactory connectionFactory) : ITickRepository
 {
     public async Task AddTicksAsync(IReadOnlySet<Tick> ticks, CancellationToken cancellationToken)
     {
