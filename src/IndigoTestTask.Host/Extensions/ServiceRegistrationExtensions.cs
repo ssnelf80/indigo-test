@@ -87,9 +87,9 @@ public static class ServiceRegistrationExtensions
         builder.Services.AddHostedService<BobDataSourceAdapter>();
         builder.Services.AddHostedService<ChloeDataSourceAdapter>();
         
-        builder.Services.AddResiliencePipeline("ws-client", (builder) =>
+        builder.Services.AddResiliencePipeline("ws-client", (pipeline) =>
         {
-            builder.AddRetry(new RetryStrategyOptions
+            pipeline.AddRetry(new RetryStrategyOptions
             {
                 Name = null,
                 MaxRetryAttempts = int.MaxValue,
