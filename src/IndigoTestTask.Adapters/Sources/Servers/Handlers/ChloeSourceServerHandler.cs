@@ -18,7 +18,7 @@ public sealed class ChloeSourceServerHandler(IOptions<ChloeServiceOptions> optio
             Ticker = Guid.NewGuid().ToString(),
             Price = price,
             Volume = Random.Next(1, 1001) * price,
-            Timestamp = default
+            Timestamp = DateTimeOffset.Now
         };
     }
 }

@@ -12,7 +12,7 @@ public class TickRepositoryTest(TickRepositoryServiceFixture tickRepositoryServi
     private readonly ITickRepository _tickRepository = tickRepositoryServiceFixture.ServiceProvider.GetRequiredService<ITickRepository>();
 
     [Fact]
-    public async Task TickRepositoryShouldIgnoreDuplicateMessage()
+    public async Task TickRepository_ShouldIgnoreDuplicateMessage()
     {
         // Arrange
         var tick = new Tick
@@ -23,9 +23,10 @@ public class TickRepositoryTest(TickRepositoryServiceFixture tickRepositoryServi
             Volume = 10,
             Stock = Stock.Alice
         };
+        var tickSet = new HashSet<Tick>([tick]);
         // Act
-        await _tickRepository.AddTicksAsync([tick], CancellationToken.None);
-        await _tickRepository.AddTicksAsync([tick], CancellationToken.None);
+        await _tickRepository.AddTicksAsync(tickSet, CancellationToken.None);
+        await _tickRepository.AddTicksAsync(tickSet, CancellationToken.None);
         // Assert
         Assert.Equal(1, await _tickRepository.CountAsync(CancellationToken.None));
     }

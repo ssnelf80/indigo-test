@@ -6,7 +6,7 @@ namespace IndigoTestTask.DAL.Ticks;
 
 public class TickRepository(TickConnectionFactory connectionFactory) : ITickRepository
 {
-    public async Task AddTicksAsync(IReadOnlyCollection<Tick> ticks, CancellationToken cancellationToken)
+    public async Task AddTicksAsync(IReadOnlySet<Tick> ticks, CancellationToken cancellationToken)
     {
         const string query = """
                              INSERT INTO ticks (ticker, timestamp, price, volume, stock)
@@ -36,7 +36,7 @@ public class TickRepository(TickConnectionFactory connectionFactory) : ITickRepo
         var parameters = new
         {
             Tickers = ticks.Select(t => t.Ticker).ToArray(),
-            Timestamps = ticks.Select(t => t.Timestamp).ToArray(),
+            Timestamps = ticks.Select(t => t.Timestamp.ToUniversalTime()).ToArray(),
             Prices = ticks.Select(t => t.Price).ToArray(),
             Volumes = ticks.Select(t => t.Volume).ToArray(),
             Stocks = ticks.Select(t => t.Stock.ToString().ToLower()).ToArray() 
