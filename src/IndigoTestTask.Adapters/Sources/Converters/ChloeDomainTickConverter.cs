@@ -1,7 +1,7 @@
+using IndigoTestTask.Adapters.Sources.BaseTickConverter;
 using IndigoTestTask.Adapters.Sources.Dtos;
 using IndigoTestTask.Domain.Entities;
 using IndigoTestTask.Domain.Enums;
-using IndigoTestTask.Domain.Services.BaseTickConverter;
 
 namespace IndigoTestTask.Adapters.Sources.Converters;
 

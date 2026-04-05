@@ -2,8 +2,9 @@
 
 public abstract class BaseSourceServerOptions
 {
-    public bool CanSendDuplicate { get; init; }
-    public bool CanLongTimeAbort { get; init; }
-    public bool CanSingleTimeAbort { get; init; }
+    public int SendDuplicateIntervalSec { get; init; }
+    public int UnavailableIntervalSec { get; init; }
+    public int SingleTimeAbortIntervalSec { get; init; }
+    public int SendInvalidMessageIntervalSec { get; init; }
     public int Rps { get; init; }
 }

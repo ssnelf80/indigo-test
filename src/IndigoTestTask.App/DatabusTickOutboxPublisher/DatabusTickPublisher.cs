@@ -2,6 +2,7 @@
 using IndigoTestTask.Domain.Repositories;
 using KafkaFlow.Producers;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 
@@ -14,7 +15,6 @@ public class DatabusTickPublisher : IDatabusPublisher, IDisposable
     private readonly Timer _timerPoll;
     private readonly IServiceScopeFactory _serviceProviderFactory;
     private readonly IReadOnlyCollection<OutboxTickPublishWorker> _outboxPublishWorkers;
-    
 
     public DatabusTickPublisher(IProducerAccessor producerAccessor, IServiceScopeFactory serviceProviderFactory, ILogger<DatabusTickPublisher> logger, OutboxProvider outboxProvider)
     {
@@ -64,5 +64,6 @@ public class DatabusTickPublisher : IDatabusPublisher, IDisposable
     public void Dispose()
     {
         _timerPoll.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

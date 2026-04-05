@@ -1,9 +1,9 @@
 ﻿using System.Net.WebSockets;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using IndigoTestTask.Adapters.Sources.BaseTickConverter;
 using IndigoTestTask.Adapters.Sources.Options;
 using IndigoTestTask.Domain.Repositories;
-using IndigoTestTask.Domain.Services.BaseTickConverter;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -45,7 +45,9 @@ public abstract class BaseDataSourceAdapter<T>(
             {
                 if (item is null)
                     throw new ArgumentNullException(nameof(item));
+               
                 var domainModel = domainTickConverter.ToDomainModel(item);
+               
                 await databusPublisher.PublishAsync(JsonSerializer.SerializeToUtf8Bytes(domainModel),
                     cancellationToken);
             }

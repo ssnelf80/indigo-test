@@ -1,6 +1,6 @@
 ﻿using IndigoTestTask.Domain.Entities;
 
-namespace IndigoTestTask.Domain.Services.BaseTickConverter;
+namespace IndigoTestTask.Adapters.Sources.BaseTickConverter;
 
 public abstract class BaseDomainTickConverter<T> where T : ITickDto
 {
@@ -12,7 +12,7 @@ public abstract class BaseDomainTickConverter<T> where T : ITickDto
         }
         catch (Exception ex)
         {
-            throw new DomainConverterException(ex.Message);
+            throw new DomainConverterException($"Failed convert dto to domain model: {ex.Message}");
         }
     }
     

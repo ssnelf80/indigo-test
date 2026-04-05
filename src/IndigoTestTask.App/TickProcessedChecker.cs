@@ -1,5 +1,4 @@
-﻿using IndigoTestTask.DAL.Ticks;
-using IndigoTestTask.Domain.Repositories;
+﻿using IndigoTestTask.Domain.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -9,7 +8,7 @@ namespace IndigoTestTask.App;
 public class TickProcessedChecker : IHostedService, IDisposable
 {
     private readonly Timer _timer;
-    private const int CheckProcessedCountTimeoutMs = 1_000;
+    private const int CheckProcessedCountTimeoutMs = 5_000;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ILogger<TickProcessedChecker> _logger;
 
@@ -23,6 +22,7 @@ public class TickProcessedChecker : IHostedService, IDisposable
     public void Dispose()
     {
        _timer.Dispose();
+       GC.SuppressFinalize(this);
     }
 
     private async void CheckProcessedCount(object? state)
