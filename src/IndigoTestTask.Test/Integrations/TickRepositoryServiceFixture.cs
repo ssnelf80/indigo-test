@@ -22,7 +22,8 @@ public class TickRepositoryServiceFixture : IDisposable
             .UseContainer()
             .UseCompose()
             .FromFile(composeFile)
-            .RemoveOrphans() 
+            .RemoveOrphans()
+            .WaitForHealthy(1_000)
             .Build()
             .Start();
         

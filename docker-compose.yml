@@ -10,7 +10,14 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - pg_data:/var/lib/postgresql/data    
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
+      interval: 2s
+      timeout: 2s
+      retries: 5
+      start_period: 2s
+    
   
   kafka:
     image: apache/kafka-native
